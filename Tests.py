@@ -8,7 +8,7 @@ testDict = {"class_1": ["ABC", "AAB", "CAB", "CCC"],
             "class_4": []}
 testUniqueWords = ['ABC AAB CAB CCC', 'BBC AAA AAB', 'BBA AAA BBB BCA CBA BAC CAB', '']
 
-textForPrediction = [["BBC", "AAA"], ["BBA", "AAA", "BBB"]]
+textForPrediction = [["BBC", "AAA"], ["BBA", "AAA", "BBB"], ["FFG"]]
 
 class TfidfMatrixCreatorTests(unittest.TestCase):
     def test_matrix_size(self):
@@ -23,6 +23,7 @@ class TfidfMatrixCreatorTests(unittest.TestCase):
         tf_idf = TfIdfMatrix(testDict)
         #print(tf_idf.trainVector.toarray())
         clc = BayesClassifier(tf_idf)
+        clc.fit()
         transformedText = tf_idf.transformText(textForPrediction)
         predictedClass = clc.predictClass(transformedText)
         self.assertIs(predictedClass[0], "class_2")

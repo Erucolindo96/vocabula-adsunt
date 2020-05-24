@@ -5,10 +5,12 @@ class BayesClassifier:
     def __init__(self, TfIdfTable):
         self.trainingData = TfIdfTable
         self.NaiveBayesClassifier = MultinomialNB()
-        self.labelsNumbers = self.setLabelsNumbers(TfIdfTable.labels)
-        self.NaiveBayesClassifier.fit(TfIdfTable.trainVector, self.labelsNumbers)
+        self.labelsNumbers = self.__setLabelsNumbers(TfIdfTable.labels)
 
-    def setLabelsNumbers(self, classLabels):
+    def fit(self):
+        self.NaiveBayesClassifier.fit(self.trainingData.trainVector, self.labelsNumbers)
+
+    def __setLabelsNumbers(self, classLabels):
         labelsNumbers = []
         for i in range(len(classLabels)):
             labelsNumbers.append(i)

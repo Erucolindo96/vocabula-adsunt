@@ -5,22 +5,22 @@ import numpy as np
 class TfIdfMatrix:
     def __init__(self, bagOfWordsSet):
         self.vec = TfidfVectorizer()
-        self.corpus = self.transformSetForVectorizer(bagOfWordsSet)
-        self.labels = self.getLabels(bagOfWordsSet)
-        [self.TfIdfTable, self.trainVector] = self.computeTfIdfTable()
+        self.corpus = self.__transformSetForVectorizer(bagOfWordsSet)
+        self.labels = self.__getLabels(bagOfWordsSet)
+        [self.TfIdfTable, self.trainVector] = self.__computeTfIdfTable()
 
-    def transformSetForVectorizer(self, bagOfWordsSet):
+    def __transformSetForVectorizer(self, bagOfWordsSet):
         corpus = {}
         for c in bagOfWordsSet:
             corpus[c] = " ".join(bagOfWordsSet[c])
         corpus = list(corpus.values())
         return corpus
     
-    def getLabels(self, bagOfWordsSet):
+    def __getLabels(self, bagOfWordsSet):
         labels = list(bagOfWordsSet)
         return labels
 
-    def computeTfIdfTable(self):
+    def __computeTfIdfTable(self):
         vectors = self.vec.fit_transform(self.corpus)
         feature_names = self.vec.get_feature_names()
         dense = vectors.todense()
