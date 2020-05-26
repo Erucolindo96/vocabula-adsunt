@@ -1,3 +1,2 @@
 DROP TABLE book;
 DROP TABLE age;
-DROP TABLE author;

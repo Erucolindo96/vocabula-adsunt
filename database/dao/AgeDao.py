@@ -19,7 +19,7 @@ class AgeDao:
         connection.commit()
         connection.close()
 
-        return Age(row[0], row[1]) if row else None
+        return Age(row[0], row[1], row[2]) if row else None
 
     def get_by_name(self, age_name: str) -> Age:
         connection = sqlite3.connect(config.database['path'])
@@ -32,13 +32,27 @@ class AgeDao:
         connection.commit()
         connection.close()
 
-        return Age(row[0], row[1]) if row else None
+        return Age(row[0], row[1], row[2]) if row else None
 
-    def insert(self, age_name: str) -> None:
+    def get_by_slug(self, slug: str):
         connection = sqlite3.connect(config.database['path'])
         cursor = connection.cursor()
-        cursor.execute('INSERT INTO age(name) VALUES (:age_name)',
-                       {'age_name': age_name})
+        cursor.execute('SELECT * FROM age WHERE slug = :name',
+                       {'name': slug})
+
+        row = cursor.fetchone()
+
+        connection.commit()
+        connection.close()
+
+        return Age(row[0], row[1], row[2]) if row else None
+
+    def insert(self, age_name: str, age_slug) -> None:
+        connection = sqlite3.connect(config.database['path'])
+        cursor = connection.cursor()
+        cursor.execute('INSERT INTO age(name, slug) VALUES (:age_name, '
+                       ':slug)',
+                       {'age_name': age_name, 'slug': age_slug})
 
         connection.commit()
         connection.close()
@@ -60,7 +74,7 @@ class AgeDao:
 
         age_list = []
         for row in data:
-            age_list.append(Age(row[0], row[1]))
+            age_list.append(Age(row[0], row[1], row[2]))
 
         connection.commit()
         connection.close()

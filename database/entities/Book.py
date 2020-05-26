@@ -1,17 +1,17 @@
-from database.entities.Author import Author
 from database.entities.Age import Age
 
 
 class Book:
 
     def __init__(self, book_id: int, title: str, uri: str, age: Age,
-                 author: Author):
+                 author: str, author_slug: str):
         self.__id = book_id
         self.__title = title
         self.__content = None
         self.__uri = uri
         self.__age = age
         self.__author = author
+        self.__author_slug = author_slug
 
     def get_id(self) -> int:
         return self.__id
@@ -34,8 +34,20 @@ class Book:
     def get_age(self) -> Age:
         return self.__age
 
-    def get_author(self) -> Author:
+    def get_author(self) -> str:
         return self.__author
+
+    def set_author(self, name: str):
+        self.__author = name
+
+    def get_author_slug(self) -> str:
+        return self.__author_slug
+
+    def set_author_slug(self, slug: str):
+        self.__author_slug = slug
+
+    def set_age(self, age: Age):
+        self.__age = age
 
     def __str__(self):
         id = str(self.get_id()) if self.get_id() else ''
@@ -45,5 +57,4 @@ class Book:
         age = str(self.get_age()) if self.get_age() else ''
         author = str(self.get_author()) if self.get_author() else ''
 
-        return '(' + id + ', ' + title + ', has_content: ' + has_content \
-               + ', ' + uri + ', ' + age + ', ' + author + ')'
+        return '(' + id + ', ' + title + ', has_content: ' + has_content + ', ' + uri + ', ' + age + ', ' + author + ')'

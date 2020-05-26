@@ -4,7 +4,6 @@ from typing import List
 from config import config
 from database.entities.Book import Book
 from database.entities.Age import Age
-from database.entities.Author import Author
 
 
 class BookDao:
@@ -15,27 +14,26 @@ class BookDao:
         connection = sqlite3.connect(config.database['path'])
         cursor = connection.cursor()
 
-        cursor.execute('SELECT book.id, title, uri, author.id, author.name, '
-                       'age.id, age.name FROM book '
-                       'LEFT OUTER JOIN author ON author.id = book.author_id '
+        cursor.execute('SELECT book.id, title, uri, author, author_slug, '
+                       'age.id, age.name, age.slug FROM book'
                        'LEFT OUTER JOIN age ON age.id = book.age_id '
                        'WHERE book.id = :id', {'id': book_id})
         row = cursor.fetchone()
 
         connection.commit()
         connection.close()
-        age = Age(row[5], row[6]) if row else None
-        author = Author(row[3], row[4]) if row else None
+        age = Age(row[5], row[6], row[7]) if row else None
 
-        return Book(row[0], row[1], row[2], age, author) if row else None
+        return Book(book_id=row[0], title=row[1], uri=row[2], age=age,
+                    author=row[3],
+                    author_slug=row[4]) if row else None
 
     def list_by_title(self, book_title: str) -> List[Book]:
         connection = sqlite3.connect(config.database['path'])
         cursor = connection.cursor()
 
-        cursor.execute('SELECT id, title, uri, author.id, author.name, '
-                       'age.id, age.name FROM book '
-                       'LEFT OUTER JOIN author ON author.id = book.author_id'
+        cursor.execute('SELECT id, title, uri, author, author_slug, '
+                       'age.id, age.name, age.slug FROM book'
                        'LEFT OUTER JOIN age ON age.id = book.age_id '
                        'WHERE book.title like :title',
                        {'title': '%' + book_title + '%'})
@@ -43,9 +41,10 @@ class BookDao:
 
         book_list = []
         for row in data:
-            age = Age(row[5], row[6]) if row else None
-            author = Author(row[3], row[4]) if row else None
-            book_list.append(Book(row[0], row[1], row[2], age, author))
+            age = Age(row[5], row[6], row[7]) if row else None
+
+            book_list.append(Book(book_id=row[0], title=row[1], uri=row[2],
+                                  age=age, author=row[3], author_slug=row[4]))
 
         connection.commit()
         connection.close()
@@ -71,17 +70,20 @@ class BookDao:
         cursor = connection.cursor()
 
         author = book.get_author()
+        author_slug = book.get_author_slug()
         age = book.get_age()
-        author_id = author.get_id() if author else None
         age_id = age.get_id() if age else None
 
         cursor.execute('INSERT INTO '
-                       'book(title, content, uri, author_id, age_id) '
+                       'book(title, content, uri, author, author_slug, '
+                       'age_id) '
                        'VALUES '
-                       '(:title, :content, :uri, :author_id, :age_id)',
+                       '(:title, :content, :uri, :author, :author_slug, '
+                       ':age_id)',
                        {'title': book.get_title(),
                         'content': book.get_content(), 'uri': book.get_uri(),
-                        'author_id': author_id, 'age_id': age_id})
+                        'author': author, 'author_slug' : author_slug,
+                        'age_id' : age_id})
 
         connection.commit()
         connection.close()
@@ -99,40 +101,38 @@ class BookDao:
         connection = sqlite3.connect(config.database['path'])
         cursor = connection.cursor()
 
-        cursor.execute('SELECT book.id, title, uri, author.id, author.name, '
-                       'age.id, age.name FROM book '
-                       'LEFT OUTER JOIN author ON author.id = book.author_id '
+        cursor.execute('SELECT book.id, title, uri, author, author_slug, '
+                       'age.id, age.name, age.slug FROM book'
                        'LEFT OUTER JOIN age ON age.id = book.age_id ')
         data = cursor.fetchall()
 
         book_list = []
         for row in data:
-            age = Age(row[5], row[6]) if row else None
-            author = Author(row[3], row[4]) if row else None
-            book_list.append(Book(row[0], row[1], row[2], age, author))
+            age = Age(row[5], row[6], row[7]) if row else None
+            book_list.append(Book(book_id=row[0], title=row[1], uri=row[2],
+                                  age=age, author=row[3], author_slug=row[4]))
 
         connection.commit()
         connection.close()
 
         return book_list
 
-    def list_by_author(self, author: Author) -> List[Book]:
+    def list_by_author_name(self, author_name: str) -> List[Book]:
         connection = sqlite3.connect(config.database['path'])
         cursor = connection.cursor()
 
-        cursor.execute('SELECT book.id, title, uri, author.id, author.name, '
-                       'age.id, age.name FROM book '
-                       'INNER JOIN author ON author.id = book.author_id '
+        cursor.execute('SELECT book.id, title, uri, author, author_slug, '
+                       'age.id, age.name, age.slug FROM book '
                        'LEFT OUTER JOIN age ON age.id = book.age_id '
-                       'WHERE author.name like :title',
-                       {'title': '%' + author.get_name() + '%'})
+                       'WHERE author like :name',
+                       {'name': '%' + author_name + '%'})
         data = cursor.fetchall()
 
         book_list = []
         for row in data:
-            age = Age(row[5], row[6]) if row else None
-            author = Author(row[3], row[4]) if row else None
-            book_list.append(Book(row[0], row[1], row[2], age, author))
+            age = Age(row[5], row[6], row[7]) if row else None
+            book_list.append(Book(book_id=row[0], title=row[1], uri=row[2],
+                                  age=age, author=row[3], author_slug=row[4]))
 
         connection.commit()
         connection.close()
