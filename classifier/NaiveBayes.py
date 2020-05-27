@@ -1,5 +1,5 @@
 from sklearn.naive_bayes import MultinomialNB
-from TfIdfMatrix import *
+from classifier.TfIdfMatrix import *
 
 class BayesClassifier:
     def __init__(self, TfIdfTable):

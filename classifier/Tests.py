@@ -1,6 +1,5 @@
 import unittest
-from TfIdfMatrix import *
-from NaiveBayes import *
+from classifier.NaiveBayes import *
 
 testDict = {"class_1": ["ABC", "AAB", "CAB", "CCC"],
             "class_2": ["BBC", "AAA", "AAB"],
