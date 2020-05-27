@@ -1,3 +1,5 @@
+from config import Logs
+
 path = {
     "prefix": "/home/krzysztof/Dokumenty/WEDT/vocabulae-adsunt"
 }
@@ -14,6 +16,13 @@ lekser = {
     'stopwords': []
 }
 
-with open(lekser['stopwords-path'],
+
+def create_config():
+    with open(lekser['stopwords-path'],
           encoding='utf-8') as f:
-    lekser['stopwords'] = f.read()
+        lekser['stopwords'] = f.read()
+
+    Logs.setLogLevel()
+
+
+create_config()

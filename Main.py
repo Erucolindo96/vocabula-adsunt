@@ -1,6 +1,5 @@
-
-from lecture.wolnelektury.service.WolneLekturyService import \
-    WolneLekturyService
+from config.Logs import *
+from lecture.wolnelektury.service.WolneLekturyService import WolneLekturyService
 
 
 def main():
