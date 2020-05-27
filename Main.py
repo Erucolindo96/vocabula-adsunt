@@ -1,9 +1,11 @@
-from Logs import *
+from config.Logs import *
+from lecture.wolnelektury.service.WolneLekturyService import WolneLekturyService
+
 
 def main():
-    setLogLevel()
-    logging.debug("Debug_info_test")
-    pass
+
+    WolneLekturyService.load_lecture_by_author_slug('adam-mickiewicz')
+
 
 if __name__ == "__main__":
     main()
