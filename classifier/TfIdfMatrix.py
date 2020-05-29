@@ -28,9 +28,6 @@ class TfIdfMatrix:
         TfIdfTable = pd.DataFrame(denselist, columns=feature_names, index=self.labels)
         return TfIdfTable, vectors
 
-    def transformText(self, text):
-        joinedText = []
-        for t in text:
-            joinedText.append(" ".join(t))
-        transformedText = self.vec.transform(joinedText)
-        return transformedText
+    def transformText(self, texts):
+        transformedTexts = self.vec.transform(texts)
+        return transformedTexts
