@@ -15,7 +15,7 @@ class BookDao:
         cursor = connection.cursor()
 
         cursor.execute('SELECT book.id, title, uri, author, author_slug, '
-                       'age.id, age.name, age.slug FROM book'
+                       'age.id, age.name, age.slug FROM book '
                        'LEFT OUTER JOIN age ON age.id = book.age_id '
                        'WHERE book.id = :id', {'id': book_id})
         row = cursor.fetchone()
@@ -32,8 +32,8 @@ class BookDao:
         connection = sqlite3.connect(config.database['path'])
         cursor = connection.cursor()
 
-        cursor.execute('SELECT id, title, uri, author, author_slug, '
-                       'age.id, age.name, age.slug FROM book'
+        cursor.execute('SELECT book.id, title, uri, author, author_slug, '
+                       'age.id, age.name, age.slug FROM book '
                        'LEFT OUTER JOIN age ON age.id = book.age_id '
                        'WHERE book.title like :title',
                        {'title': '%' + book_title + '%'})
@@ -82,8 +82,8 @@ class BookDao:
                        ':age_id)',
                        {'title': book.get_title(),
                         'content': book.get_content(), 'uri': book.get_uri(),
-                        'author': author, 'author_slug' : author_slug,
-                        'age_id' : age_id})
+                        'author': author, 'author_slug': author_slug,
+                        'age_id': age_id})
 
         connection.commit()
         connection.close()
@@ -102,7 +102,7 @@ class BookDao:
         cursor = connection.cursor()
 
         cursor.execute('SELECT book.id, title, uri, author, author_slug, '
-                       'age.id, age.name, age.slug FROM book'
+                       'age.id, age.name, age.slug FROM book '
                        'LEFT OUTER JOIN age ON age.id = book.age_id ')
         data = cursor.fetchall()
 
