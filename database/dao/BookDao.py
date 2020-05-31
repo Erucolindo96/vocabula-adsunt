@@ -1,5 +1,5 @@
 import sqlite3
-from typing import List
+from typing import List, Dict
 
 from config import config
 from database.entities.Book import Book
@@ -138,3 +138,73 @@ class BookDao:
         connection.close()
 
         return book_list
+
+    def list_ids_by_age_slug(self, age_slug: str) -> List[int]:
+        connection = sqlite3.connect(config.database['path'])
+        cursor = connection.cursor()
+
+        cursor.execute('SELECT book.id FROM book '
+                       'LEFT OUTER JOIN age ON age.id = book.age_id '
+                       'WHERE age.slug = :age_slug', {'age_slug': age_slug})
+        data = cursor.fetchall()
+
+        book_ids = []
+        for row in data:
+            book_ids.append(row[0])
+
+        connection.commit()
+        connection.close()
+
+        return book_ids
+
+    def get_content_words_count_for_ids(self, ids: List[int]) -> Dict[int, int]:
+        connection = sqlite3.connect(config.database['path'])
+        cursor = connection.cursor()
+
+        cursor.execute('SELECT book.id, '
+                       'CASE WHEN length(content) >= 1 THEN (length(content) - length(replace(content, \' \', \'\'))) + 1 '
+                       'ELSE (length(content) - length(replace(content, \' \', \'\'))) END '
+                       'as NumOfWords '
+                       'FROM book WHERE id IN ({ids})'.format(ids=','.join(['?'] * len(ids))),
+                       ids)
+
+        data = cursor.fetchall()
+
+        book_words_cnt = {} if len(data) > 0 else None
+
+        for row in data:
+            id = row[0]
+            lenght = row[1]
+            book_words_cnt[id] = lenght
+
+        connection.commit()
+        connection.close()
+
+        return book_words_cnt
+
+    def list_ages_words(self) -> Dict[str, int]:
+        connection = sqlite3.connect(config.database['path'])
+        cursor = connection.cursor()
+
+        cursor.execute('SELECT age.slug, '
+                       'sum((CASE WHEN length(content) >= 1 '
+                       'THEN (length(content) - length(replace(content, \' \', \'\'))) + 1 '
+                       'ELSE (length(content) - length(replace(content, \' \', \'\'))) '
+                       'END)) '
+                       'as class_words '
+                       'FROM book '
+                       'LEFT JOIN age ON age.id = book.age_id '
+                       'GROUP BY age.slug')
+        data = cursor.fetchall()
+
+        ages_words = {}
+
+        for row in data:
+            slug = row[0]
+            lenght = row[1]
+            ages_words[slug] = lenght
+
+        connection.commit()
+        connection.close()
+
+        return ages_words
