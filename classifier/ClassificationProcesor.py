@@ -2,6 +2,7 @@ import logging
 
 from classifier.NaiveBayes import *
 from classifier.DataSet import *
+import pandas as pd
 
 
 class ClassificationProcesor:
@@ -36,10 +37,12 @@ class ClassificationProcesor:
     def testClassifier(self):
         self.trueResult = 0
         self.falseResult = 0
+        self.confusionMatrix = pd.DataFrame(0, index = self.tf_idf.labels,  columns=self.tf_idf.labels)
         for age in self.testData.dataSet:
             transformedText = self.tf_idf.transformText(self.testData.dataSet[age])
             predictedClass = self.clc.predictClass(transformedText)
             for result in predictedClass:
+                self.confusionMatrix[result][age] += 1
                 if result == age:
                     self.trueResult += 1
                 else:
@@ -48,3 +51,6 @@ class ClassificationProcesor:
         falseResultPercent = (self.falseResult) / (self.trueResult + self.falseResult) * 100
         logging.info("Procent poprawnych odpowiedzi klasyfikatora: {} %".format(trueResultPercent))
         logging.info("Procent niepoprawnych odpowiedzi klasyfikatora: {}%".format(falseResultPercent))
+
+        logging.info("Macierz pomyłek: {}".format(self.confusionMatrix.to_string()))
+
