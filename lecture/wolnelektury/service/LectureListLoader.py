@@ -16,7 +16,7 @@ class LectureListLoader:
 
     @staticmethod
     def list_by_author_slug(slug: str) -> List[dict]:
-        url = wolne_lektury['host'] + LectureListLoader.authors_api + slug +\
+        url = wolne_lektury['host'] + LectureListLoader.authors_api + slug + \
               '/books'
         data = urllib.request.urlopen(url)
         data = data.read()
@@ -41,7 +41,8 @@ class LectureListLoader:
         get_foot = False
         foot_part = []
 
-        nopunc = [char for char in mess if char not in string.punctuation and char not in ['—', '…', '„', '”', '«', '»']]
+        nopunc = [char for char in mess if
+                  char not in string.punctuation and char not in ['—', '…', '„', '”', '«', '»']]
         nopunc = TextPreprocessing.only_normal_e(nopunc)
         nopunc = ''.join(nopunc)
         nopunc = [word.lower() for word in nopunc.split() if word.lower() not in stopwords]
@@ -80,3 +81,16 @@ class LectureListLoader:
         name = details['epochs'][0]['name']
         slug = details['epochs'][0]['slug']
         return Age(age_id=None, name=name, slug=slug)
+
+    @staticmethod
+    def check_is_polish(details: dict):
+        if len(details['translators']) != 0:
+            raise LectureTranslatedException(details['title'])
+
+
+class LectureTranslatedException(BaseException):
+    def __init__(self, lecture: str):
+        self.__l = lecture
+
+    def get_lecture(self) -> str:
+        return self.__l

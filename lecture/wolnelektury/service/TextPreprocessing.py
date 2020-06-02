@@ -37,5 +37,16 @@ class TextPreprocessing:
         return result
 
     @staticmethod
+    def remove_author_and_title(text):
+        line = 0
+        idx_to_remove = 0
+        for idx, char in enumerate(text[:1000]):
+            if char == '\n':
+                line += 1
+            if line == 4 and char == '\n':
+                idx_to_remove = idx
+        return text[idx_to_remove:]
+
+    @staticmethod
     def only_normal_e(string_or_list: List[str]) -> List[str]:
         return ['e' if char == 'é' else char for char in string_or_list]

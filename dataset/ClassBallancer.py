@@ -1,6 +1,8 @@
 import random
-from typing import List
+from typing import List, Dict
 
+from config import config
+from config.config import classification
 from database.dao.BookDao import BookDao
 
 
@@ -10,18 +12,28 @@ class ClassBallancer:
         self.__age_slugs = age_slugs
         self.__book_ids_per_age = {}
         self.__dao = BookDao()
+        self.__age_slugs = classification['age-slugs']
 
     def ballance(self):
-        min_class = self.__get_min_class()
-        for age_slug in self.__age_slugs:
-            self.__book_ids_per_age[age_slug] = self.__get_ballanced_ids_for_class(age_slug=age_slug,
-                                                                                   min_class=min_class)
 
-    def get_book_ids_of_age(self, age_slug: str):
+        if config.classification['ballance_class'] is True:
+            min_class = self.__get_min_class(age_slugs=self.__age_slugs)
+            for age_slug in self.__age_slugs:
+                self.__book_ids_per_age[age_slug] = self.__get_ballanced_ids_for_class(age_slug=age_slug,
+                                                                                       min_class=min_class)
+        else:
+            for slug in self.__age_slugs:
+                self.__book_ids_per_age[slug] = self.__get_all_ids_for_class(age_slug=slug)
+
+    def get_book_ids_of_age(self, age_slug: str) -> List[int]:
         return self.__book_ids_per_age[age_slug]
 
-    def __get_min_class(self) -> (str, int):
+    def get_book_ids_per_age(self) -> Dict[str, List[int]]:
+        return self.__book_ids_per_age
+
+    def __get_min_class(self, age_slugs) -> (str, int):
         ages_words = self.__dao.list_ages_words()
+        ages_words = {key: ages_words[key] for key in age_slugs}
         min_age_with_words = min(ages_words.items(), key=lambda x: x[1])
         return min_age_with_words
 
@@ -36,9 +48,12 @@ class ClassBallancer:
         class_size = 0
         class_book_ids = []
         for id in book_ids:
-            if class_size >= min_class[1]:
+            if class_size >= min_class[1] or class_size >= config.classification['max-class-size']:
                 break
             class_book_ids.append(id)
             class_size += id_to_words[id]
 
         return class_book_ids
+
+    def __get_all_ids_for_class(self, age_slug) -> List[int]:
+        return self.__dao.list_ids_by_age_slug(age_slug=age_slug)

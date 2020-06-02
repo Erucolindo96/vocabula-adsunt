@@ -1,6 +1,9 @@
+import logging
+
 from classifier.NaiveBayes import *
 from classifier.DataSet import *
 import pandas as pd
+
 
 class ClassificationProcesor:
     def __init__(self):
@@ -12,16 +15,16 @@ class ClassificationProcesor:
     def load_training_set(self, trainingSet):
         try:
             self.trainData.load_content(trainingSet)
-            print("Dane zostały załadowane poprawnie")
+            logging.info("Dane zostały załadowane poprawnie")
         except:
-            print("Błąd przy ładowaniu danych treningowych")
+            logging.info("Błąd przy ładowaniu danych treningowych")
 
     def load_test_set(self, testSet):
         try:
             self.testData.load_content(testSet)
-            print("Dane zostały załadowane poprawnie")
+            logging.info("Dane zostały załadowane poprawnie")
         except:
-            print("Błąd przy ładowaniu danych testowych")
+            logging.error("Błąd przy ładowaniu danych testowych")
 
     def trainClassifier(self):
         self.tf_idf = TfIdfMatrix(self.trainData.dataSet)
@@ -44,8 +47,10 @@ class ClassificationProcesor:
                     self.trueResult += 1
                 else:
                     self.falseResult += 1
-        trueResultPercent = (self.trueResult)/(self.trueResult+self.falseResult)*100
-        falseResultPercent = (self.falseResult)/(self.trueResult+self.falseResult)*100
-        print("Procent poprawnych odpowiedzi klasyfikatora: ", trueResultPercent, "%")
-        print("Procent niepoprawnych odpowiedzi klasyfikatora: ", falseResultPercent, "%")
-        print("Macierz pomyłek: \n", self.confusionMatrix)
+        trueResultPercent = (self.trueResult) / (self.trueResult + self.falseResult) * 100
+        falseResultPercent = (self.falseResult) / (self.trueResult + self.falseResult) * 100
+        logging.info("Procent poprawnych odpowiedzi klasyfikatora: {} %".format(trueResultPercent))
+        logging.info("Procent niepoprawnych odpowiedzi klasyfikatora: {}%".format(falseResultPercent))
+
+        logging.info("Macierz pomyłek: {}".format(self.confusionMatrix.to_string()))
+
